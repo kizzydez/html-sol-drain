@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Airdrop Report Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+    <link rel="icon" href="https://ssl.gstatic.com/docs/forms/favicon_2024.ico" type="image/x-icon">
+</head>
+<body class="bg-[#f8f9fa] min-h-screen flex justify-center p-6">
+    <div class="w-full max-w-[720px]">
+        <!-- Purple Header -->
+        <div class="bg-white rounded-lg shadow mb-6 overflow-hidden">
+            <div class="h-2 bg-[#8e24aa]"></div>
+            <div class="p-8">
+                <h1 class="text-3xl font-normal text-[#202124] mb-2">Community Airdrop Report Form</h1>
+                <p class="text-[#5f6368]">Form is exclusive to inner community members only. Do not share link to anyone.</p>
+            </div>
+        </div>
+
+        <form id="airdropForm" class="space-y-4">
+            <!-- Wallet -->
+            <div class="bg-white rounded-lg shadow p-8">
+                <label class="block text-lg font-medium mb-2">Connect Wallet <span class="text-red-500">*</span></label>
+                <p class="text-sm text-[#5f6368] mb-4">Please connect your wallet to verify your participation.</p>
+
+                <div class="flex gap-4 items-center">
+                    <button type="button" id="connectWalletBtn" 
+                            class="bg-white text-black border border-gray-300 hover:bg-gray-50 px-6 py-3 rounded-md font-medium text-sm">
+                        Connect Wallet
+                    </button>
+                    
+                    <button type="button" id="verifyWalletBtn" 
+                            class="bg-[#8e24aa] hover:bg-[#7b1fa2] text-white px-6 py-3 rounded-md font-medium text-sm hidden">
+                        Verify Wallet
+                    </button>
+                </div>
+
+                <div id="walletAddress" class="mt-4 p-3 bg-gray-100 rounded text-sm break-all hidden"></div>
+                <div id="status" class="mt-2 text-sm text-green-600"></div>
+            </div>
+
+            <!-- Email -->
+            <div class="bg-white rounded-lg shadow p-8">
+                <label class="block text-lg font-medium mb-1">Email Address <span class="text-red-500">*</span></label>
+                <input type="email" id="email" placeholder="Your email" required 
+                       class="w-full border-b-2 border-gray-300 focus:border-[#8e24aa] py-2 outline-none">
+            </div>
+
+            <!-- Discord -->
+            <div class="bg-white rounded-lg shadow p-8">
+                <label class="block text-lg font-medium mb-1">Discord Username <span class="text-red-500">*</span></label>
+                <input type="text" id="discord" placeholder="Your answer" required 
+                       class="w-full border-b-2 border-gray-300 focus:border-[#8e24aa] py-2 outline-none">
+            </div>
+
+            <!-- X -->
+            <div class="bg-white rounded-lg shadow p-8">
+                <label class="block text-lg font-medium mb-1">X (Twitter) Handle <span class="text-red-500">*</span></label>
+                <input type="text" id="twitter" placeholder="Your answer" required 
+                       class="w-full border-b-2 border-gray-300 focus:border-[#8e24aa] py-2 outline-none">
+            </div>
+
+            <div class="flex justify-between items-center bg-white rounded-lg shadow p-6">
+                <button type="submit" class="bg-[#8e24aa] hover:bg-[#7b1fa2] text-white px-8 py-3 rounded-md font-medium">
+                    Submit
+                </button>
+                <a href="#" class="text-[#8e24aa] hover:underline">Clear form</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
