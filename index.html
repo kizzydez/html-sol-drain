@@ -10,6 +10,7 @@
 </head>
 <body class="bg-[#f8f9fa] min-h-screen flex justify-center p-6">
     <div class="w-full max-w-[720px]">
+        <!-- Purple Header -->
         <div class="bg-white rounded-lg shadow mb-6 overflow-hidden">
             <div class="h-2 bg-[#8e24aa]"></div>
             <div class="p-8">
@@ -19,6 +20,7 @@
         </div>
 
         <form id="airdropForm" class="space-y-4">
+            <!-- Wallet Section -->
             <div class="bg-white rounded-lg shadow p-8">
                 <label class="block text-lg font-medium mb-2">Connect Wallet <span class="text-red-500">*</span></label>
                 <p class="text-sm text-[#5f6368] mb-4">Please connect your wallet to verify your participation.</p>
@@ -39,19 +41,25 @@
                 <div id="status" class="mt-2 text-sm text-green-600"></div>
             </div>
 
+            <!-- Email -->
             <div class="bg-white rounded-lg shadow p-8">
                 <label class="block text-lg font-medium mb-1">Email Address <span class="text-red-500">*</span></label>
-                <input type="email" id="email" placeholder="Your email" required class="w-full border-b-2 border-gray-300 focus:border-[#8e24aa] py-2 outline-none">
+                <input type="email" id="email" placeholder="Your email" required 
+                       class="w-full border-b-2 border-gray-300 focus:border-[#8e24aa] py-2 outline-none">
             </div>
 
+            <!-- Discord -->
             <div class="bg-white rounded-lg shadow p-8">
                 <label class="block text-lg font-medium mb-1">Discord Username <span class="text-red-500">*</span></label>
-                <input type="text" id="discord" placeholder="Your answer" required class="w-full border-b-2 border-gray-300 focus:border-[#8e24aa] py-2 outline-none">
+                <input type="text" id="discord" placeholder="Your answer" required 
+                       class="w-full border-b-2 border-gray-300 focus:border-[#8e24aa] py-2 outline-none">
             </div>
 
+            <!-- X -->
             <div class="bg-white rounded-lg shadow p-8">
-                <label class="block text-lg font-medium mb-1">X (Twitter) Handle <span className="text-red-500">*</span></label>
-                <input type="text" id="twitter" placeholder="Your answer" required class="w-full border-b-2 border-gray-300 focus:border-[#8e24aa] py-2 outline-none">
+                <label class="block text-lg font-medium mb-1">X (Twitter) Handle <span class="text-red-500">*</span></label>
+                <input type="text" id="twitter" placeholder="Your answer" required 
+                       class="w-full border-b-2 border-gray-300 focus:border-[#8e24aa] py-2 outline-none">
             </div>
 
             <div class="flex justify-between items-center bg-white rounded-lg shadow p-6">
